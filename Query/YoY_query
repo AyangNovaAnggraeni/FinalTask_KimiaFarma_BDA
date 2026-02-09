@@ -1,0 +1,21 @@
+CREATE OR REPLACE VIEW
+  `rakamin-kf-analytics-484806.kimia_farma.view_yoy_sales` AS
+SELECT
+  year,
+  total_nett_sales,
+  SAFE_DIVIDE(
+    total_nett_sales 
+      - LAG(total_nett_sales) OVER (ORDER BY year),
+    LAG(total_nett_sales) OVER (ORDER BY year)
+  ) AS yoy_nett_sales
+FROM (
+  SELECT
+    EXTRACT(YEAR FROM date) AS year,
+    SUM(nett_sales) AS total_nett_sales
+  FROM
+    `rakamin-kf-analytics-484806.kimia_farma.analysis_table`
+  GROUP BY
+    year
+)
+ORDER BY
+  year;
